@@ -131,6 +131,12 @@ Python's extensive libraries and ease of integration with Arduino make it ideal 
 ##### Past programs done throughout unit 2
 
 # Criterion D: Functionality
+## FULL Readings:
+### Data from R2:
+![Figure_1](https://github.com/user-attachments/assets/e149d9ec-a808-4d0b-90e9-98f9e6b011c6)
+### Data from R3:
+![Figure_2](https://github.com/user-attachments/assets/8696ad43-2ddc-4894-a76d-963b9094f2a1)
+
 ## Scientific poster showing findings:
 ![Beige and White Contemporary Editorial Landscape University Research Poster](https://github.com/user-attachments/assets/24bccb03-e4a8-4890-8832-fbbbdad680d6)
 ## Video oveview of Project:
