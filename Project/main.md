@@ -10,6 +10,21 @@
 
 # Criterion B: Solution Overview
 
+## Record of Tasks:
+| **Date**       | **Task Description**                                          | **Planned Outcome**                                                                                         | **Time Estimate** | **Target Completion Date** | **Criterion**         |
+|-----------------|--------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|-------------------|----------------------------|------------------------|
+| 2024-11-25      | Initial meeting with Bread and Bakes to understand their needs. | Clearly define the problem: identify the need for monitoring proofing conditions in R2 and R3.                | 1 hour            | 2024-11-25                | Criterion A: Analysis |
+| 2024-11-26      | Research and compare humidity and temperature sensors.         | Select a low-cost, suitable sensor (DHT11) for the project requirements.                                     | 2 hours           | 2024-11-26                | Criterion A: Analysis |
+| 2024-11-27      | Design a prototype system for data collection using Arduino.   | Create a basic circuit setup with Arduino UNO and DHT11 for data collection.                                 | 3 hours           | 2024-11-28                | Criterion B: Development |
+| 2024-11-29      | Develop and test Python script for real-time data logging.     | Create a functional Python program to log temperature, humidity, and pressure data from sensors.             | 4 hours           | 2024-11-30                | Criterion B: Development |
+| 2024-11-30      | Deploy sensors in R2 and R3 to begin data collection.          | Record environmental data in both locations for a 24-hour period.                                            | 2 hours           | 2024-12-01                | Criterion C: Solution |
+| 2024-12-02      | Analyze collected data and create visualizations.              | Generate graphs showing temperature, humidity, and pressure trends in R2 and R3.                             | 3 hours           | 2024-12-03                | Criterion C: Solution |
+| 2024-12-03      | Begin drafting the science poster.                             | Complete initial sections of the poster: introduction, problem definition, and methodology.                  | 2 hours           | 2024-12-04                | Criterion C: Solution |
+| 2024-12-04      | Feedback session with Bread and Bakes.                         | Present early results and poster outline to client for input and improvements.                               | 1 hour            | 2024-12-04                | Criterion C: Solution |
+| 2024-12-05      | Refine Python script and update graphs with smoother outputs.  | Improved data accuracy and graph clarity to better represent the findings.                                   | 2 hours           | 2024-12-05                | Criterion C: Solution |
+| 2024-12-06      | Finalize science poster and ensure print-readiness.            | Complete all sections of the poster, including results, conclusion, and recommendations.                     | 3 hours           | 2024-12-06                | Criterion C: Solution |
+| 2024-12-07      | Record and edit a video demonstrating the project and poster.  | Produce a 6-7 minute video showcasing the solution, poster, and project workflow.                            | 4 hours           | 2024-12-08                | Criterion D: Evaluation |
+
 ## Test Plan:
 | Test Case  | Objective                                  | Input                     | Expected Outcome                                | Estimated Time | Date Completed |
 |------------|--------------------------------------------|---------------------------|-------------------------------------------------|----------------|----------------|
@@ -19,7 +34,7 @@
 | 4          | Handle server disconnection                | Server is unavailable     | Data is saved locally, failure count increments | 3 days         | Dec 5th        |
 
 ## Systems Diagram:
-<img width="817" alt="Screenshot 2024-12-09 at 0 41 53 AM" src="https://github.com/user-attachments/assets/83c1f726-e108-4a97-9104-48bd5974d1dd">
+<img width="961" alt="Screenshot 2024-12-09 at 9 31 53 AM" src="https://github.com/user-attachments/assets/8c81dac5-635a-41ad-8714-aa45c741b063">
 
 ## Flow Diagrams:
 ### Server Log In: 
@@ -99,21 +114,21 @@ Python's extensive libraries and ease of integration with Arduino make it ideal 
 
 ## Sources: 
 ### DHT:
-https://www.circuitbasics.com/how-to-set-up-the-dht11-humidity-sensor-on-an-arduino/
+##### https://www.circuitbasics.com/how-to-set-up-the-dht11-humidity-sensor-on-an-arduino/
 ### BME:
-https://iotdesignpro.com/projects/interfacing-bmp280-with-arduino-to-read-pressure-temperature-and-altitude
+##### https://iotdesignpro.com/projects/interfacing-bmp280-with-arduino-to-read-pressure-temperature-and-altitude
 ### Socket:
-https://docs.python.org/3/library/socket.html
+##### https://docs.python.org/3/library/socket.html
 ### DATE TIME:
-https://docs.python.org/3/library/datetime.html
+##### https://docs.python.org/3/library/datetime.html
 ### PY serial:
-https://pyserial.readthedocs.io/en/latest/
+##### https://pyserial.readthedocs.io/en/latest/
 ### Error Handling:
-https://docs.python.org/3/tutorial/errors.html
+##### https://docs.python.org/3/tutorial/errors.html
 ### Arduino - Python Serial
-https://projecthub.arduino.cc/ansh2919/serial-communication-between-python-and-arduino-663756
+##### https://projecthub.arduino.cc/ansh2919/serial-communication-between-python-and-arduino-663756
 ### Extra:
-Past programs done throughout unit 2
+##### Past programs done throughout unit 2
 
 # Criterion D: Functionality
 ## Scientific poster showing findings:
