@@ -81,36 +81,111 @@ Logged failures and provided actionable feedback.
 
 # Criterion C: Development 
 
-## Proposed Solution:
-#### The solution integrates hardware (sensors and Arduino) and software (Python with libraries for data handling and REST API communication) to collect environmental data, log it locally, and upload it to a server. This approach ensures data reliability and usability by leveraging established tools and techniques.
-## Appropriate Use of Existing Tools:
-### Hardware:
-##### DHT11 and BMP280 Sensors: Used for measuring temperature, humidity, and pressure. Chosen for their accuracy and compatibility with Arduino.
-##### Arduino: Facilitates serial communication with the Python script. Chosen for its simplicity in handling sensor data.
-### Software and Libraries:
-##### Python: Acts as the central processing unit for handling and uploading data.
-##### Requests Library: Used for making HTTP POST requests to the server for authentication and data upload. Enables seamless interaction with REST APIs.
-##### Datetime and Timedelta: Used for timestamping and controlling data collection duration.
-##### Serial: Used to read data from the Arduino.
-##### Socket: Used to check server connectivity and handle fallback mechanisms.
-##### CSV Logging: Ensures data persistence when the server is unavailable.
+## List of Techniques:
+### 1. Data Logging to CSV
+### 2. Error Handling for Sensor Readings
+### 3. Data Smoothing Using a Moving Average
+### 4. Inclusion of Time Function
 
-## Adequacy of Techniques:
-#### Data Acquisition: Using sensors with Arduino ensures real-time data collection. Parsing data via Python enables efficient handling and validation.
-#### Data Logging: Writing to a CSV file ensures data reliability even if server communication fails.
-#### Server Communication: API calls provide a scalable solution for uploading data. The Authorization header secures the communication process.
-#### Error Handling: Incorporating fallback mechanisms (e.g., logging failures and saving locally) ensures robustness in unreliable network conditions.
+## Why these features?:
+### 1. Data Logging to CSV Files
+#### Problem/Purpose: The client needs a record of environmental conditions (temperature, humidity, and pressure) over time to analyze trends and compare proofing locations. Therefore I decided that storing data in a CSV file ensures easy access, reusability, and compatability for further analysis. Another benefit I noticed was that this feature also serves as the final fail safe in the event of a failed server upload after 3 attempts, where the data from the file can be used for analysis instead of the data from the server. Overall, this feature just serves as a guarantee that the code only ever needs to run once to collect all data, regrdless of network conditions.
+#### Code:
+```.py
+with open("Collected _dat2.csv", "w") as data_file:
+    #header
+    data_file.write("Timestamp, DHT11 Temp (°C), DHT11 Humidity (%), BMP280 Temp (°C), BMP280 Pressure (hPa)\n")
+    #collecting data and printing for monitoring
+    print("Starting data collection for 24 hours...")
 
-## Explanation of Use:
-#### Why REST API?
-REST APIs allow standardized communication between the Python program and the server.
-The requests library simplifies the process of sending sensor data as JSON payloads.
-#### Why Local Logging?
-Provides a backup when the server is inaccessible, ensuring no data is lost.
-#### Why Socket Connectivity Checks?
-Ensures that resources aren't wasted attempting uploads when the server is down.
-#### Why Python?
-Python's extensive libraries and ease of integration with Arduino make it ideal for this application.
+    while datetime.now() < end_time:
+        if arduino_serial.in_waiting > 0:
+            line = arduino_serial.readline().decode('utf-8').strip()
+            print("Received:", line)
+
+        if "DHT11" in line and "BMP280" in line:
+            parts = line.split(",")
+            dht_temp = float(parts[0].split(":")[1].strip()[:-2])
+            dht_hum = float(parts[1].split(":")[1].strip()[:-1])
+            bmp_temp = float(parts[2].split(":")[1].strip()[:-2])
+            bmp_pres = float(parts[3].split(":")[1].strip()[:-3])
+
+            time_stamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            log_data(data_file, dht_temp, dht_hum, bmp_temp, bmp_pres)
+            print(f"Logged: {time_stamp}, {dht_temp} °C, {dht_hum} %, {bmp_temp} °C, {bmp_pres} hPa")
+        else:
+            print("Where is my data?")
+```
+#### Explanation: 
+##### data_file.write(): This line initialises the data file and prints the header so the data in the file can be more easily interpeted.
+##### Data Parsing and Logging: The split() method breaks the line into individual components, each sensor's value is extracted and converted to a floating point number (e.g., dht_temp for DHT11 temperature).
+##### Main Data Collection Loop: Inside the loop, the program checks if data is available from the Arduino serial port (arduino_serial). If data is available, it reads one line, decodes it from bytes to a string, and strips extra whitespace.
+
+### 2. Error Handling for Sensor Readings
+#### Problem/Purpose: Sensor errors or communication failures would cause my program to crash and stop recording data, which would affect the reliability of my solution. To prevent this, I implemented error handling to ensure the system remains functional without introducing errors or requiring me to manually restart the program. Restarting would introduce inaccuracies in the data and create issues like inconsistencies in the length of data and disparities between readings.
+#### Code:
+```.py
+def check_connection(host=server_ip, port=80, timeout=3):
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.create_connection((host, port))
+        return True
+    except OSError:
+        return False
+import socket
+
+if check_connection():
+  try:
+  r = requests.post(f'http://{server_ip}/login', json=user)
+  access_token = r.json()['access_token']
+  auth = {"Authorization": f"Bearer {access_token}"}
+  data = {'sensor_id': dht_temp_id, 'value': f'{dht_temp:2f}'}
+  r = requests.post(f'http://{server_ip}/reading/new', json=data, headers=auth)
+  print(r.json())
+else:
+  print("No server connection saving locally")
+  time.sleep(60)
+```
+#### Explanation:
+##### Socket: By using the socket library, I allowed my program to directly test the connection to the server before executing the upload code, ensuring a successful upload and preventing an error message.  
+##### Try-Except: I used a try-except block as a second layer of this fail-safe. If a connection exists but the program “tries” to upload and fails, instead of crashing, it simply moves to the except function and continues running smoothly.
+##### Authenticated Upload: Sends a POST request to the server to authenticate and obtain an access_token and constructs an authorization header and formats the sensor data (dht_temp) into a JSON payload.
+
+### 3. Data Smoothing Using a Moving Average
+#### Problem/Purpose: Raw sensor data often contains noise, such as extreme highs and lows, which makes it challenging for me to identify clear trends. To address this, I applied a moving average filter to smooth the data. This helped me create graphs and analysis that are more presentable and meaningful for the client, while also reducing the prominence of extreme variations in the data.
+#### Code:
+```.py
+def moving_average(windowSize:int, x:list)->list:
+    x_smooth = []
+    for i in range(0, len(x)-windowSize):
+        x_section = x[i:i+windowSize]
+        x_average = sum(x_section)/windowSize
+        x_smooth.append(x_average)
+    return x_smooth
+
+#Dht
+box2 = fig.add_subplot(grid[0:3,1:3])
+temp_smooth = moving_average(windowSize=10, x=y[211])
+plt.plot(temp_smooth, color='salmon', label='DHT temp')
+plt.ylabel('Temperatures (C)')
+```
+#### Explanation:
+##### Function Definition: Defines a reusable function moving_average that accepts windowSize, The number of data points to average in each step and x, A list of raw sensor readings.
+##### Moving Window Logic: Loops through the data, creating "windows" of size windowSize.
+
+### 4. Inclusion of Time Function
+#### Problem/Purpose: I Included this section because due to the recording session being 24 hours long, I did not want to time it myself and manually end the program. Due to my busy lifestyle it was more feesable for me to find a way to end the program automatically; this is where the datetime and timedelta functions come into play. 
+```.py
+end_time = datetime.now() + timedelta(minutes=623)
+
+    while datetime.now() < end_time:
+        if arduino_serial.in_waiting > 0:
+            line = arduino_serial.readline().decode('utf-8').strip()
+            print("Received:", line)
+```
+#### Explanation:
+##### End Time Calculation: Uses Python's datetime and timedelta modules to calculate the end time for data collection.
+##### While Loop for Time Management: Continuously checks the current time against the predefined end_time and ensures the loop runs only within the specified time frame, maintaining control over data collection duration.
 
 ## Sources: 
 ### DHT:
