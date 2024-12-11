@@ -172,6 +172,7 @@ plt.ylabel('Temperatures (C)')
 #### Explanation:
 ##### Function Definition: Defines a reusable function moving_average that accepts windowSize, The number of data points to average in each step and x, A list of raw sensor readings.
 ##### Moving Window Logic: Loops through the data, creating "windows" of size windowSize.
+##### Integration with the Graph: Applies the moving_average function to temperature data (y[211]) and plots the smoothed temperature readings using Matplotlib with a specific color and label.
 
 ### 4. Inclusion of Time Function
 #### Problem/Purpose: I Included this section because due to the recording session being 24 hours long, I did not want to time it myself and manually end the program. Due to my busy lifestyle it was more feesable for me to find a way to end the program automatically; this is where the datetime and timedelta functions come into play. 
